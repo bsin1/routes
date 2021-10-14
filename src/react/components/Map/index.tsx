@@ -1,14 +1,16 @@
 import { useEffect } from "react"
 import styles from "src/react/styles/MapboxMap.module.css"
 import mapboxgl from "mapbox-gl"
+import MapboxDraw from "@mapbox/mapbox-gl-draw"
 
 const MapboxMap = () => {
   let map: mapboxgl.Map | null = null
   const defaultLat = 0.04092881639623261
   const defaultLng = 0.08654556598968949
   const defaultZoom = 12.5
+  const city = { x: 0.07119048878516902, y: 0.017279328052012866 }
+
   const ores = [
-    { x: 0.07119048878516902, y: 0.017279328052012866 },
     { x: 0.07144414587544641, y: 0.016156344115335054 },
     { x: 0.07144802659444574, y: 0.01612784955452278 },
     { x: 0.07190041781756265, y: 0.016284048616125483 },
@@ -1192,7 +1194,6 @@ const MapboxMap = () => {
     { x: 0.060832686885772896, y: 0.004349858201374911 },
     { x: 0.06073088087190327, y: 0.0043530292543278535 },
     { x: 0.06065412885709372, y: 0.004331891895692521 },
-    { x: 0.07119048878516902, y: 0.017279328052012866 },
   ]
 
   useEffect(() => {
@@ -1203,7 +1204,6 @@ const MapboxMap = () => {
     let token = process.env.REACT_APP_MAPBOX_TOKEN ?? ""
     console.log("GOT TOKEN: ", token)
     mapboxgl.accessToken = token
-    //handleMapLoading(true)
     let container = document.getElementById("main-map")!
 
     let newMap = new mapboxgl.Map({
@@ -1212,28 +1212,34 @@ const MapboxMap = () => {
       preserveDrawingBuffer: true,
     })
 
+    // let draw = new MapboxDraw()
+
+    // newMap.addControl(draw)
+
     newMap.on("load", loadSources)
-
-    //newMap.on("dragend", showProperties)
-
-    //newMap.on("zoomend", showProperties)
 
     map = newMap
   }
 
   const loadMarkers = () => {
+    if (!map) {
+      return
+    }
+
+    let marker = new mapboxgl.Marker({ color: "#00ff00" })
+      .setLngLat(new mapboxgl.LngLat(city.x, city.y))
+      .addTo(map!)
+
     ores.forEach((ore) => {
-      if (map) {
-        let marker = new mapboxgl.Marker()
-          .setLngLat(new mapboxgl.LngLat(ore.x, ore.y))
-          .addTo(map)
+      let marker = new mapboxgl.Marker({ color: "#ff0000" })
+        .setLngLat(new mapboxgl.LngLat(ore.x, ore.y))
+        .addTo(map!)
 
-        let markerDiv = marker.getElement()
+      let markerDiv = marker.getElement()
 
-        markerDiv.addEventListener("click", () =>
-          console.log("CLICKED: ", marker.getLngLat())
-        )
-      }
+      markerDiv.addEventListener("click", () =>
+        console.log("CLICKED: ", marker.getLngLat())
+      )
     })
   }
 
