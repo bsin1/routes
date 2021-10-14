@@ -1,5 +1,6 @@
 import fs from "fs"
 import readline from "readline"
+import * as turf from "@turf/turf"
 
 interface Coordinate {
   x: number
@@ -80,11 +81,29 @@ export const appStart = async () => {
 
   orderedOres.push(cityCord)
 
+  let wgsOres: Coordinate[] = orderedOres.map((ore) => {
+    let point = turf.point([ore.y, ore.x])
+    let converted = turf.toWgs84(point)
+    return {
+      x: converted.geometry.coordinates[1],
+      y: converted.geometry.coordinates[0],
+    }
+  })
+
   let writeStream = fs.createWriteStream("output.csv")
 
-  orderedOres.forEach((ore, index) => {
-    writeStream.write(`${index},${ore.x},${ore.y}\n`)
+  wgsOres.forEach((ore, index) => {
+    writeStream.write(`${ore.x},${ore.y}\n`)
   })
   writeStream.end()
+
+  writeStream = fs.createWriteStream("output.json")
+  writeStream.write("[")
+  wgsOres.forEach((ore, index) => {
+    writeStream.write(`{ x: ${ore.x}, y: ${ore.y} },\n`)
+  })
+  writeStream.write("]")
+  writeStream.end()
+
   console.log("DONE")
 }
