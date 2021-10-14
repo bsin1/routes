@@ -1,9 +1,11 @@
 .MapboxMap {
-  margin: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  text-align: center;
   background-color: #eeeeee;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  height: 800px;
+  font-size: calc(10px + 2vmin);
   position: relative;
 }
 

@@ -50,7 +50,7 @@ async function startServer() {
     `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
   )
 
-  //appStart()
+  appStart()
 
   return { server, app }
 }
