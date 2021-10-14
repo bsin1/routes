@@ -4,9 +4,9 @@ import mapboxgl from "mapbox-gl"
 
 const MapboxMap = () => {
   let map: mapboxgl.Map | null = null
-  const defaultLat = 0.66259620645024
-  const defaultLng = -0.73141638294691
-  const defaultZoom = 11
+  const defaultLat = 0.04092881639623261
+  const defaultLng = 0.08654556598968949
+  const defaultZoom = 12.5
   const ores = [
     { x: 0.07119048878516902, y: 0.017279328052012866 },
     { x: 0.07144414587544641, y: 0.016156344115335054 },
@@ -1224,9 +1224,15 @@ const MapboxMap = () => {
   const loadMarkers = () => {
     ores.forEach((ore) => {
       if (map) {
-        new mapboxgl.Marker()
+        let marker = new mapboxgl.Marker()
           .setLngLat(new mapboxgl.LngLat(ore.x, ore.y))
           .addTo(map)
+
+        let markerDiv = marker.getElement()
+
+        markerDiv.addEventListener("click", () =>
+          console.log("CLICKED: ", marker.getLngLat())
+        )
       }
     })
   }
