@@ -1,0 +1,64 @@
+{
+  "name": "routes",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^26.0.24",
+    "@types/mapbox-gl": "^2.4.2",
+    "@types/node": "^12.20.33",
+    "@types/react": "^17.0.29",
+    "@types/react-dom": "^17.0.9",
+    "apollo-server-express": "^3.4.0",
+    "express": "^4.17.1",
+    "graphql": "^15.6.1",
+    "graphql-middleware": "^6.1.8",
+    "mapbox-gl": "^2.5.1",
+    "nexus": "^1.1.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.4.4",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --p tsconfig-backend.json && GENERATE_SOURCEMAP=false react-scripts build && mv build reactApp && touch index.html",
+    "clean": "rm -rf dist && rm -rf build && rm -rf reactApp",
+    "client": "react-scripts start",
+    "eject": "react-scripts eject",
+    "server": "ts-node-dev --no-notify --respawn --transpile-only -P tsconfig-backend.json src/backend/server",
+    "start": "node dist/server",
+    "test": "react-scripts test"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": false
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^2.4.1",
+    "ts-node": "^10.3.0",
+    "ts-node-dev": "^1.1.8"
+  }
+}
