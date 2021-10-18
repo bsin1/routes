@@ -5,6 +5,9 @@ import * as http from "http"
 import { schema as baseSchema } from "./schema/schema"
 import { applyMiddleware } from "graphql-middleware"
 import { appStart } from "./modules/routes"
+import { markers } from "./config/constants"
+import { applyCors } from "./config/cors"
+import path from "path"
 
 const isHeroku = process.env.NODE_ENV === "production"
 const port = isHeroku ? process.env.PORT : 3001
@@ -14,8 +17,22 @@ async function startServer() {
 
   const httpServer = http.createServer(app)
 
-  app.get("/", function (_, res) {
-    res.send("Landing Page Here")
+  app.get("/", function (req, res, next) {
+    res.sendFile(path.resolve(__dirname + "/../reactApp/index.html"))
+  })
+
+  app.get("*", function (req, res, next) {
+    res.sendFile(path.resolve(__dirname + "/../reactApp/index.html"))
+  })
+
+  app.get("/markers.png", function (_, res) {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.sendFile(__dirname + "/resources/markers.png")
+  })
+
+  app.get("/markers.json", function (_, res) {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.send(JSON.stringify(markers))
   })
 
   //force restart on sigterm
@@ -39,6 +56,8 @@ async function startServer() {
   await server.start()
 
   app.use(express.json({ limit: "50mb" }))
+
+  applyCors(app)
 
   server.applyMiddleware({ app })
 
