@@ -29,10 +29,13 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "build": "npm run clean && tsc --p tsconfig-backend.json && GENERATE_SOURCEMAP=false react-scripts build && mv build reactApp && touch index.html",
+    "build": "npm run clean && npm run generate && tsc --p tsconfig-backend.json && GENERATE_SOURCEMAP=false react-scripts build && mv build reactApp && touch index.html",
     "clean": "rm -rf dist && rm -rf build && rm -rf reactApp",
     "client": "react-scripts start",
     "eject": "react-scripts eject",
+    "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
+    "generate:prisma": "npx prisma generate",
+    "generate:nexus": "cross-env NODE_ENV=development ts-node --transpile-only src/backend/schema/schema",
     "server": "ts-node-dev --no-notify --respawn --transpile-only -P tsconfig-backend.json src/backend/server",
     "start": "node dist/server",
     "test": "react-scripts test"
