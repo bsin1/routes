@@ -18,7 +18,7 @@ app.get("/", function (req, res, next) {
 
 app.get("/markers.png", function (_, res) {
   res.header("Access-Control-Allow-Origin", "*")
-  res.sendFile(__dirname + "/resources/markers.png")
+  res.sendFile(path.resolve("src/backend/resources/markers.png"))
 })
 
 app.get("/markers.json", function (_, res) {
@@ -54,6 +54,9 @@ app.use(express.json({ limit: "50mb" }))
 app.use(express.static(path.resolve(__dirname + "/../resources")))
 
 app.use(express.static(path.resolve(__dirname + "/../reactApp")))
+
+app.use(express.static(path.resolve(__dirname + "/public")))
+app.use(express.static(path.resolve(__dirname + "/resources")))
 
 applyCors(app)
 
