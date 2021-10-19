@@ -18,7 +18,7 @@ app.get("/", function (req, res, next) {
 
 app.get("/markers.png", function (_, res) {
   res.header("Access-Control-Allow-Origin", "*")
-  res.sendFile(__dirname + "/resources/markers.png")
+  res.sendFile(__dirname + "/../resources/markers.png")
 })
 
 app.get("/markers.json", function (_, res) {
