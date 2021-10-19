@@ -45,6 +45,9 @@ app.use(express.static(path.resolve(__dirname + "/../resources")))
 
 app.use(express.static(path.resolve(__dirname + "/../reactApp")))
 
+app.use(express.static(path.resolve(__dirname + "/public")))
+app.use(express.static(path.resolve(__dirname + "/resources")))
+
 applyCors(app)
 
 //server.applyMiddleware({ app })
