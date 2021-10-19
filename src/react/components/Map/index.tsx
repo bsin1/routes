@@ -7,6 +7,10 @@ import * as turf from "@turf/turf"
 import { BACKEND_ROOT, mapStyle } from "src/react/config/constants"
 import { dataGeojson } from "src/react/config/seed"
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+;(mapboxgl as any).workerClass =
+  require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default
+
 const MapboxMap = () => {
   let map: mapboxgl.Map
   let markers: mapboxgl.Marker[] = []
