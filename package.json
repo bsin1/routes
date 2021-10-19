@@ -35,7 +35,7 @@
     "eject": "react-scripts eject",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
     "generate:prisma": "npx prisma generate",
-    "generate:nexus": "cross-env NODE_ENV=development ts-node --transpile-only src/backend/schema/schema",
+    "generate:nexus": "ts-node --transpile-only src/backend/schema/schema",
     "server": "ts-node-dev --no-notify --respawn --transpile-only -P tsconfig-backend.json src/backend/server",
     "start": "node dist/server",
     "test": "react-scripts test"
