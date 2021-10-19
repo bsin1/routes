@@ -26,6 +26,16 @@ app.get("/markers.json", function (_, res) {
   res.send(JSON.stringify(markers))
 })
 
+app.get("/markers@2x.png", function (_, res) {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.sendFile(__dirname + "/resources/markers.png")
+})
+
+app.get("/markers@2x.json", function (_, res) {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.send(JSON.stringify(markers))
+})
+
 //force restart on sigterm
 process.on("SIGTERM", function () {
   process.exit(0)
