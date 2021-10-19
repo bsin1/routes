@@ -21,10 +21,6 @@ async function startServer() {
     res.sendFile(path.resolve(__dirname + "/../reactApp/index.html"))
   })
 
-  app.get("*", function (req, res, next) {
-    res.sendFile(path.resolve(__dirname + "/../reactApp/index.html"))
-  })
-
   app.get("/markers.png", function (_, res) {
     res.header("Access-Control-Allow-Origin", "*")
     res.sendFile(__dirname + "/resources/markers.png")
