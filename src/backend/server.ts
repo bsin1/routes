@@ -41,6 +41,8 @@ process.on("SIGINT", function () {
 
 app.use(express.json({ limit: "50mb" }))
 
+app.use(express.static(path.resolve(__dirname + "/../resources")))
+
 app.use(express.static(path.resolve(__dirname + "/../reactApp")))
 
 applyCors(app)
