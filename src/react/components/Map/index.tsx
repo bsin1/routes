@@ -18,7 +18,6 @@ const MapboxMap = () => {
   const defaultLat = 0.04092881639623261
   const defaultLng = 0.08654556598968949
   const defaultZoom = 12.5
-  const city = { x: 0.07119048878516902, y: 0.017279328052012866 }
 
   useEffect(() => {
     console.log("USE EFFECT CALLED")
@@ -90,30 +89,159 @@ const MapboxMap = () => {
       return
     }
 
-    map.addSource("towns", dataGeojson.towns as any)
+    let air = dataGeojson.essences.air_boid
+    air.data.features.concat(dataGeojson.essences.air_plant.data.features)
+    air.data.features.concat(dataGeojson.essences.air_stone.data.features)
 
-    map.addSource("iron", dataGeojson.ores.iron as any)
+    let fire = dataGeojson.essences.fire_boid
+    fire.data.features.concat(dataGeojson.essences.fire_plant.data.features)
+    fire.data.features.concat(dataGeojson.essences.fire_stone.data.features)
 
-    map.addLayer({
-      id: "townPoints",
-      type: "symbol",
-      source: "towns", // reference the data source
-      layout: {
-        "icon-allow-overlap": true,
-        "icon-image": "outpost", // reference the image
-        "icon-size": 1,
+    let water = dataGeojson.essences.water_boid
+    water.data.features.concat(dataGeojson.essences.water_plant.data.features)
+    water.data.features.concat(dataGeojson.essences.water_stone.data.features)
+
+    let earth = dataGeojson.essences.earth_boid
+    earth.data.features.concat(dataGeojson.essences.earth_plant.data.features)
+    earth.data.features.concat(dataGeojson.essences.earth_stone.data.features)
+
+    let death = dataGeojson.essences.death_boid
+    death.data.features.concat(dataGeojson.essences.death_plant.data.features)
+    death.data.features.concat(dataGeojson.essences.death_stone.data.features)
+
+    let life = dataGeojson.essences.life_boid
+    life.data.features.concat(dataGeojson.essences.life_plant.data.features)
+    life.data.features.concat(dataGeojson.essences.life_stone.data.features)
+
+    let soul = dataGeojson.essences.soul_boid
+    soul.data.features.concat(dataGeojson.essences.soul_plant.data.features)
+    soul.data.features.concat(dataGeojson.essences.soul_stone.data.features)
+
+    let mapData = [
+      { imageId: "outpost", data: dataGeojson.towns },
+      { imageId: "iron", data: dataGeojson.ores.iron },
+      {
+        imageId: "crystal",
+        data: dataGeojson.ores.crystal,
       },
-    })
-
-    map.addLayer({
-      id: "ironPoints",
-      type: "symbol",
-      source: "iron", // reference the data source
-      layout: {
-        "icon-image": "iron", // reference the image
-        "icon-size": 1,
-        "icon-allow-overlap": true,
+      {
+        imageId: "gold",
+        data: dataGeojson.ores.gold,
       },
+      {
+        imageId: "lodestone",
+        data: dataGeojson.ores.lodestone,
+      },
+      {
+        imageId: "orichalcum",
+        data: dataGeojson.ores.orichalcum,
+      },
+      {
+        imageId: "platinium",
+        data: dataGeojson.ores.platinium,
+      },
+      {
+        imageId: "oil",
+        data: dataGeojson.ores.seeping_stone,
+      },
+      {
+        imageId: "silver",
+        data: dataGeojson.ores.silver,
+      },
+      {
+        imageId: "starmetal",
+        data: dataGeojson.ores.starmetal,
+      },
+      {
+        imageId: "air_essence",
+        data: air,
+      },
+      {
+        imageId: "water_essence",
+        data: water,
+      },
+      {
+        imageId: "earth_essence",
+        data: earth,
+      },
+      {
+        imageId: "fire_essence",
+        data: fire,
+      },
+      {
+        imageId: "life_essence",
+        data: life,
+      },
+      {
+        imageId: "death_essence",
+        data: death,
+      },
+      {
+        imageId: "soul_essence",
+        data: soul,
+      },
+      {
+        imageId: "hemp",
+        data: dataGeojson.plants.hemp,
+      },
+      {
+        imageId: "silkweed",
+        data: dataGeojson.plants.hemp_t4,
+      },
+      {
+        imageId: "wirefiber",
+        data: dataGeojson.plants.hemp_t5,
+      },
+      {
+        imageId: "broccoli",
+        data: dataGeojson.plants.broccoli,
+      },
+      {
+        imageId: "blueberry",
+        data: dataGeojson.plants.blueberry,
+      },
+      {
+        imageId: "barley",
+        data: dataGeojson.plants.barley,
+      },
+      {
+        imageId: "cabbage",
+        data: dataGeojson.plants.cabbage,
+      },
+      {
+        imageId: "carrot",
+        data: dataGeojson.plants.carrot,
+      },
+      {
+        imageId: "corn",
+        data: dataGeojson.plants.corn,
+      },
+      {
+        imageId: "potato",
+        data: dataGeojson.plants.potato,
+      },
+      {
+        imageId: "squash",
+        data: dataGeojson.plants.squash,
+      },
+      {
+        imageId: "strawberry",
+        data: dataGeojson.plants.strawberries,
+      },
+    ]
+
+    mapData.forEach((item) => {
+      map.addSource(item.imageId, item.data as any)
+      map.addLayer({
+        id: `${item.imageId}_points`,
+        type: "symbol",
+        source: item.imageId, // reference the data source
+        layout: {
+          "icon-allow-overlap": true,
+          "icon-image": item.imageId, // reference the image
+          "icon-size": 1,
+        },
+      })
     })
 
     // data.ores.iron.forEach((ore, i) => {
