@@ -3,7 +3,7 @@ import styles from "src/react/styles/MapboxMap.module.css"
 import mapboxgl from "mapbox-gl"
 import MapboxDraw from "@mapbox/mapbox-gl-draw"
 import * as turf from "@turf/turf"
-import { mapStyle } from "src/react/config/constants"
+import { BACKEND_ROOT, mapStyle } from "src/react/config/constants"
 import { dataGeojson } from "src/react/config/seed"
 
 const MapboxMap = () => {
@@ -132,6 +132,9 @@ const MapboxMap = () => {
 
   const loadSources = () => {
     console.log("LOAD SOURCES")
+
+    console.log("BACKEND ROOT: ", BACKEND_ROOT)
+
     if (map?.isStyleLoaded() === false) {
       console.log("STYLE NOT YET LOADED")
       setTimeout(() => {
