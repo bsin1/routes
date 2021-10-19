@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import styles from "src/react/styles/MapboxMap.module.css"
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import mapboxgl from "mapbox-gl"
 import MapboxDraw from "@mapbox/mapbox-gl-draw"
 import * as turf from "@turf/turf"
