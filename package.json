@@ -31,8 +31,8 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "build": "npm run clean && npm run generate && tsc --p tsconfig-backend.json && GENERATE_SOURCEMAP=false react-scripts build && mv build reactApp && touch index.html",
-    "clean": "rm -rf dist && rm -rf build && rm -rf reactApp",
+    "build": "npm run clean && tsc --p tsconfig-backend.json && GENERATE_SOURCEMAP=false react-scripts build && mv build reactApp && touch index.html",
+    "clean": "rm -rf dist && rm -rf build && rm -rf reactApp rm ./index.html",
     "client": "react-scripts start",
     "eject": "react-scripts eject",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",

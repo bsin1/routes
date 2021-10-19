@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ES6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,6 +22,12 @@
     "noEmit": true,
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": ["node_modules", "dist", "reactApp"],
-  "include": ["src/react", "src/index.tsx"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "reactApp"
+  ],
+  "include": [
+    "src"
+  ]
 }
