@@ -59,7 +59,7 @@ let layers = [
   "fire_essence_points",
   "life_essence_points",
   "death_essence_points",
-  "soul_essence_points",
+  "spirit_essence_points",
   "hemp_points",
   "silkweed_points",
   "wirefiber_points",
@@ -69,7 +69,7 @@ let layers = [
   "cabbage_points",
   "carrot_points",
   "corn_points",
-  "potatoe_points",
+  "potato_points",
   "squash_points",
   "strawberry_points",
 ]
@@ -248,7 +248,7 @@ const Map = ({ filters }: MapProps) => {
           data: death,
         },
         {
-          imageId: "soul_essence",
+          imageId: "spirit_essence",
           data: soul,
         },
         {
@@ -288,7 +288,7 @@ const Map = ({ filters }: MapProps) => {
           data: dataGeojson.plants.corn,
         },
         {
-          imageId: "potatoe",
+          imageId: "potato",
           data: dataGeojson.plants.potato,
         },
         {

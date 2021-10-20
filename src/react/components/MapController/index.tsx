@@ -91,8 +91,8 @@ const MapController = () => {
           value: false,
         },
         {
-          key: "soul_essence",
-          title: "Soul Essence",
+          key: "spirit_essence",
+          title: "Spirit Essence",
           value: false,
         },
       ],
@@ -146,8 +146,8 @@ const MapController = () => {
           value: false,
         },
         {
-          key: "potatoe",
-          title: "Potatoe",
+          key: "potato",
+          title: "Potato",
           value: false,
         },
         {
