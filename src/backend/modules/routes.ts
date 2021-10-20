@@ -24,35 +24,6 @@ export const appStart = async () => {
 
   // console.log("ORES LENGTH: ", ores.length)
 
-  // while (ores.length) {
-  //   let node = orderedOres[orderedOres.length - 1]
-  //   let shortest = 9999999999
-  //   let index = -1
-
-  //   ores.forEach((ore, i) => {
-  //     let xdiff = Math.abs(node.x - ore.x)
-  //     let ydiff = Math.abs(node.y - ore.y)
-
-  //     let weight = Math.sqrt(Math.pow(xdiff, 2) + Math.pow(ydiff, 2))
-
-  //     if (weight < shortest) {
-  //       shortest = weight
-  //       index = i
-  //     }
-  //   })
-
-  //   if (index != -1) {
-  //     let removed = ores.splice(index, 1)
-  //     orderedOres.push({
-  //       x: removed[0].x,
-  //       y: removed[0].y,
-  //     })
-  //   } else {
-  //     console.log("INDEX IS -1")
-  //     console.log("ORES LENGTH: ", ores.length)
-  //   }
-  // }
-
   // orderedOres.push(cityCord)
 
   /***  CONVERT DATA TO WGS84 COORDINATE SYSTEM  ***/

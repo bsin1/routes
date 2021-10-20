@@ -6,12 +6,17 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw"
 import * as turf from "@turf/turf"
 import { BACKEND_ROOT, mapStyle } from "src/react/config/constants"
 import { dataGeojson } from "src/react/config/seed"
-import { FilterSection } from "src/react/interfaces/types"
+import { BooleanFilterCell, FilterSection } from "src/react/interfaces/types"
+import { MapEditingState } from ".."
+import _ from "lodash"
 ;(mapboxgl as any).workerClass =
   require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default
 
 interface MapProps {
   filters: FilterSection[]
+  editingState: MapEditingState
+  setEditingState: (editingState: MapEditingState) => void
+  setSelectedNodes: (selectedNodes: string) => void
 }
 
 let air = dataGeojson.essences.air_boid
@@ -74,32 +79,48 @@ let layers = [
   "strawberry_points",
 ]
 
-//   map.addLayer({
-//     id: `${item.imageId}_points`,
-//     type: "symbol",
-//     source: item.imageId, // reference the data source
-//     layout: {
-//       "icon-allow-overlap": true,
-//       "icon-image": item.imageId, // reference the image
-//       "icon-size": 1,
-//     },
-//   })
-
-const Map = ({ filters }: MapProps) => {
+const Map = ({
+  filters,
+  editingState,
+  setEditingState,
+  setSelectedNodes,
+}: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null)
-  let draw: MapboxDraw
+  const draw = useRef<MapboxDraw | null>(null)
   const defaultLat = 0.04092881639623261
   const defaultLng = 0.08654556598968949
   const defaultZoom = 12.5
 
   useEffect(() => {
-    console.log("USE EFFECT CALLED")
     loadMap()
   }, [])
 
   useEffect(() => {
     updateLayers()
   }, [filters])
+
+  useEffect(() => {
+    updateEditingState()
+  }, [editingState])
+
+  const updateEditingState = () => {
+    switch (editingState) {
+      case MapEditingState.Editing: {
+        draw.current?.changeMode("draw_polygon")
+        break
+      }
+      case MapEditingState.Blank: {
+        draw.current?.deleteAll()
+        if (map.current?.getLayer("route") !== undefined) {
+          map.current?.removeLayer("route")
+        }
+        if (map.current?.getSource("route") !== undefined) {
+          map.current?.removeSource("route")
+        }
+        break
+      }
+    }
+  }
 
   const clearLayers = () => {
     console.log("MAP: ", map)
@@ -124,56 +145,162 @@ const Map = ({ filters }: MapProps) => {
       preserveDrawingBuffer: true,
     })
 
-    draw = new MapboxDraw()
+    const NewSimpleSelect = _.extend(MapboxDraw.modes.SIMPLE_SELECT, {
+      dragMove() {},
+      toDisplayFeatures(state: any, geojson: any, display: any) {
+        display(geojson)
+      },
+    })
 
-    newMap.addControl(draw)
+    const NewDirectSelect = _.extend(MapboxDraw.modes.DIRECT_SELECT, {
+      dragFeature() {},
+    })
+
+    let newDraw = new MapboxDraw({
+      modes: {
+        ...MapboxDraw.modes,
+        simple_select: NewSimpleSelect,
+        direct_select: NewDirectSelect,
+      },
+      displayControlsDefault: false,
+    })
+
+    newMap.addControl(newDraw)
 
     newMap.on("draw.create", updateArea)
-    // map.on("draw.delete", updateArea)
-    // map.on("draw.update", updateArea)
 
     newMap.on("load", loadSymbols)
+
     map.current = newMap
+    draw.current = newDraw
   }
 
   const updateArea = (event: any) => {
     console.log("GOT DRAW EVENT: ", event)
 
     let polygon = event.features[0]
-    let selectedMarkers: any[] = []
 
     //create bounding box from polygon
     let polygonBoundingBox = turf.bbox(polygon)
-    let southWest = map.current?.project([
-      polygonBoundingBox[0],
-      polygonBoundingBox[1],
-    ])
-    let northEast = map.current?.project([
-      polygonBoundingBox[2],
-      polygonBoundingBox[3],
-    ])
 
     // find features within polygon
-    // let bboxFeatures: any[] = map?.queryRenderedFeatures(
-    //   [southWest, northEast]
-    //   // {
-    //   //   layers: ["choropleth"], //Update to use layers in user's map, tested with circle and choropleth
-    //   // }
-    // )
+    if (map.current) {
+      let southWest = map.current?.project([
+        polygonBoundingBox[0],
+        polygonBoundingBox[1],
+      ])
+      let northEast = map.current?.project([
+        polygonBoundingBox[2],
+        polygonBoundingBox[3],
+      ])
 
-    //console.log("BBOX FEATURES: ", bboxFeatures)
+      let activeFilters = [
+        ...filters[0].cells,
+        ...filters[1].cells,
+        ...filters[2].cells,
+      ]
+        .filter((cell) => cell.value == true)
+        .map((cell) => `${cell.key}_points`)
 
-    // markers.forEach((marker) => {
-    //   let lnglat = marker.getLngLat()
-    //   if (turf.booleanContains(polygon, turf.point([lnglat.lng, lnglat.lat]))) {
-    //     selectedMarkers.push(marker)
-    //   }
-    // })
+      activeFilters = [...activeFilters, "outpost_points"]
 
-    // console.log("MARKERS SIZE: ", markers.length)
+      let selectedFeatures: any[] = map.current
+        .queryRenderedFeatures([southWest, northEast], {
+          layers: activeFilters, //Update to use layers in user's map, tested with circle and choropleth
+        })
+        .filter((item) => {
+          let coordinates = (item.geometry as any).coordinates
+          return turf.booleanContains(polygon, turf.point(coordinates))
+        })
 
-    console.log("SELECTED MARKERS SIZE: ", selectedMarkers.length)
-    console.log("SELECTED MARKERS: ", selectedMarkers)
+      let coordinates = selectedFeatures.map(
+        (item) => (item.geometry as any).coordinates
+      )
+      console.log("INITIAL COORDINATES SIZE: ", coordinates.length)
+
+      let orderedCords: any[] = []
+
+      orderedCords.push(coordinates.pop())
+
+      while (coordinates.length) {
+        let node = orderedCords[orderedCords.length - 1]
+        let shortest = 9999999999
+        let index = -1
+
+        console.log("NODE: ", node)
+
+        coordinates.forEach((coordinate, i) => {
+          let xdiff = Math.abs(node[0] - coordinate[0])
+          let ydiff = Math.abs(node[1] - coordinate[1])
+          console.log("COORDINATE: ", coordinate)
+          let weight = Math.sqrt(Math.pow(xdiff, 2) + Math.pow(ydiff, 2))
+
+          if (weight < shortest) {
+            shortest = weight
+            index = i
+          }
+        })
+
+        if (index != -1) {
+          let removed = coordinates.splice(index, 1)
+          orderedCords.push(removed[0])
+        }
+      }
+
+      console.log("ORDERED CORDS: ", orderedCords)
+
+      let nodesByType = selectedFeatures.reduce((result, item) => {
+        let source = item.layer.source
+        console.log("SOURCE: ", source)
+        console.log("RESULT: ", result)
+        if (!(source in result)) {
+          result[source] = 1
+        } else {
+          result[source] += 1
+        }
+        return result
+      }, {})
+
+      let geojson = {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: orderedCords,
+              },
+            },
+          ],
+        },
+      }
+
+      map.current?.addSource("route", geojson as any)
+      map.current?.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#ff0000",
+          "line-width": 5,
+        },
+      })
+
+      let selectedNodesString = Object.entries(nodesByType)
+        .map((item) => `${item[0]}: ${item[1]}`)
+        .join("\n")
+
+      setEditingState(MapEditingState.Complete)
+      setSelectedNodes(`Selected Nodes\n${selectedNodesString}`)
+
+      console.log("SELECTED FEATURES: ", selectedFeatures)
+    }
   }
 
   const loadSymbols = () => {
@@ -187,6 +314,8 @@ const Map = ({ filters }: MapProps) => {
       if (!map) {
         return
       }
+
+      //draw.current?.changeMode("static")
 
       let mapData = [
         { imageId: "outpost", data: dataGeojson.towns },
@@ -319,56 +448,6 @@ const Map = ({ filters }: MapProps) => {
       updateLayers()
       zoomToMapRegion(defaultLat, defaultLng, defaultZoom)
     }
-
-    // let geojson = {
-    //   type: "geojson",
-    //   data: {
-    //     type: "FeatureCollection",
-    //     features: [
-    //       {
-    //         type: "Feature",
-    //         geometry: {
-    //           type: "LineString",
-    //           coordinates: [
-    //             [0.08592853188624586, 0.056859315065987175],
-    //             [0.07119048878516902, 0.017279328052012866],
-    //           ],
-    //         },
-    //       },
-    //     ],
-    //   },
-    // }
-
-    // map.addSource("line", geojson as any)
-    // map.addLayer({
-    //   id: "route",
-    //   type: "line",
-    //   source: "line",
-    //   layout: {
-    //     "line-join": "round",
-    //     "line-cap": "round",
-    //   },
-    //   paint: {
-    //     "line-color": "#ff0000",
-    //     "line-width": 5,
-    //   },
-    // })
-
-    // data.ores.iron.forEach((ore, i) => {
-    //   if (i < 50) {
-    //     let marker = new mapboxgl.Marker({ color: "#ff0000" })
-    //       .setLngLat(new mapboxgl.LngLat(ore.x, ore.y))
-    //       .addTo(map!)
-
-    //     let markerDiv = marker.getElement()
-
-    //     markerDiv.addEventListener("click", () =>
-    //       console.log("CLICKED: ", marker.getLngLat())
-    //     )
-
-    //     markers.push(marker)
-    //   }
-    // })
   }
 
   const updateLayers = () => {

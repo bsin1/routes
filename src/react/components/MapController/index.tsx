@@ -4,8 +4,19 @@ import { FilterSection } from "src/react/interfaces/types"
 import styles from "src/react/styles/MapController.module.css"
 import Map from "./Map"
 import MapSideMenu from "./MapSideMenu"
+import MapActionBar from "./MapActionBar"
+
+export enum MapEditingState {
+  Blank = "BLANK",
+  Editing = "EDITING",
+  Complete = "COMPLETE",
+}
 
 const MapController = () => {
+  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
+  const [editingState, setEditingState] = useState<MapEditingState>(
+    MapEditingState.Blank
+  )
   const [filters, setFilters] = useState<FilterSection[]>([
     {
       title: "Ores",
@@ -185,8 +196,18 @@ const MapController = () => {
     <div className={styles.MapController}>
       <MapSideMenu filters={filters} onFilterChange={onFilterChange} />
       <div className={styles.MapContentArea}>
-        <div className={styles.MapActionBar}>Map Action Bar Here</div>
-        <Map filters={filters} />
+        <MapActionBar
+          selectedNodes={selectedNodes}
+          setSelectedNodes={setSelectedNodes}
+          editingState={editingState}
+          setEditingState={setEditingState}
+        />
+        <Map
+          filters={filters}
+          editingState={editingState}
+          setEditingState={setEditingState}
+          setSelectedNodes={setSelectedNodes}
+        />
       </div>
     </div>
   )
