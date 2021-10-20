@@ -1,12 +1,12 @@
 import React from "react"
 import styles from "../styles/App.module.css"
-import Map from "./Map"
+import MapController from "./MapController"
 
 const App = () => {
   return (
     <div className={styles.App}>
       <div className={styles.MainContainer}>
-        <Map />
+        <MapController />
       </div>
     </div>
   )
