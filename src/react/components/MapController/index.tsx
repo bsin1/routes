@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react"
-import { MapControllerState } from "src/react/interfaces/state"
+import { useState } from "react"
 import { FilterSection } from "src/react/interfaces/types"
 import styles from "src/react/styles/MapController.module.css"
 import Map from "./Map"
@@ -13,7 +12,6 @@ export enum MapEditingState {
 }
 
 const MapController = () => {
-  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
   )
@@ -197,8 +195,6 @@ const MapController = () => {
       <MapSideMenu filters={filters} onFilterChange={onFilterChange} />
       <div className={styles.MapContentArea}>
         <MapActionBar
-          selectedNodes={selectedNodes}
-          setSelectedNodes={setSelectedNodes}
           editingState={editingState}
           setEditingState={setEditingState}
         />
@@ -206,7 +202,6 @@ const MapController = () => {
           filters={filters}
           editingState={editingState}
           setEditingState={setEditingState}
-          setSelectedNodes={setSelectedNodes}
         />
       </div>
     </div>

@@ -1,5 +1,4 @@
-import { filterProperties } from "@turf/clusters"
-import { BooleanFilterCell, FilterSection } from "src/react/interfaces/types"
+import { FilterSection } from "src/react/interfaces/types"
 import styles from "src/react/styles/MapSideMenu.module.css"
 
 interface MapSideMenuProps {

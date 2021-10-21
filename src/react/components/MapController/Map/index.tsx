@@ -16,7 +16,6 @@ interface MapProps {
   filters: FilterSection[]
   editingState: MapEditingState
   setEditingState: (editingState: MapEditingState) => void
-  setSelectedNodes: (selectedNodes: string) => void
 }
 
 let air = dataGeojson.essences.air_boid
@@ -79,17 +78,14 @@ let layers = [
   "strawberry_points",
 ]
 
-const Map = ({
-  filters,
-  editingState,
-  setEditingState,
-  setSelectedNodes,
-}: MapProps) => {
+const Map = ({ filters, editingState, setEditingState }: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null)
   const draw = useRef<MapboxDraw | null>(null)
   const defaultLat = 0.04092881639623261
   const defaultLng = 0.08654556598968949
   const defaultZoom = 12.5
+
+  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
 
   useEffect(() => {
     loadMap()
@@ -486,10 +482,15 @@ const Map = ({
     }, 5000)
   }
 
+  let data = `THIS IS THE DATA\nDATA 1\nDATA 2\nDATA 3`
+
   return (
     // <div className={styles.MapContainer}>
-    <div id="main-map" className={styles.Map} />
-    // </div>
+    <div id="main-map" className={styles.Map}>
+      {selectedNodes != null && (
+        <div className={styles.SelectedNodes}>{selectedNodes}</div>
+      )}
+    </div>
   )
 }
 

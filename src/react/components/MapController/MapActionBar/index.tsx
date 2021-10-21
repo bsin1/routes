@@ -1,12 +1,9 @@
-import { BooleanFilterCell, FilterSection } from "src/react/interfaces/types"
 import styles from "src/react/styles/MapActionBar.module.css"
 import { MapEditingState } from ".."
 
 interface MapActionBarProps {
   editingState: MapEditingState
   setEditingState: (editingState: MapEditingState) => void
-  selectedNodes: string | null
-  setSelectedNodes: (selectedNodes: string) => void
 }
 
 const MapActionBar = (props: MapActionBarProps) => {
@@ -38,14 +35,8 @@ const MapActionBar = (props: MapActionBarProps) => {
             >
               Clear Area
             </button>
-            {props.selectedNodes != null && (
-              <div style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>
-                {props.selectedNodes}
-              </div>
-            )}
           </div>
         )
-        break
     }
   }
 
