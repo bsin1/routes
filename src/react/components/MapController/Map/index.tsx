@@ -113,6 +113,7 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
         if (map.current?.getSource("route") !== undefined) {
           map.current?.removeSource("route")
         }
+        setSelectedNodes(null)
         break
       }
     }
