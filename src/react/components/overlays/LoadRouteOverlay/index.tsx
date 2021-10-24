@@ -29,8 +29,11 @@ const LoadRouteOverlay = ({
     setRoutes(routes)
   }
 
-  const renderRoutes = (): JSX.Element[] => {
+  const renderRoutes = (): JSX.Element | JSX.Element[] => {
     console.log("RENDER ROUTES: ", routes.length)
+    if (routes.length == 0) {
+      return <div>You have no saved routes.</div>
+    }
     return routes.map((route, index) => (
       <RouteCell key={index} route={route} loadRoute={loadRoute} />
     ))

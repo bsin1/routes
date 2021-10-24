@@ -13,4 +13,6 @@
 
 .RoutesContainer {
   margin-top: 8px;
+  overflow-y: auto;
+  max-height: 600px;
 }
