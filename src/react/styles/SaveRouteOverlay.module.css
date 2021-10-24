@@ -3,6 +3,11 @@
   flex-direction: column;
 }
 
+.OverlayTitle {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .SaveButton {
   margin-top: 16px;
 }

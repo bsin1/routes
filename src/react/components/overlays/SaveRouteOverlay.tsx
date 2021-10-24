@@ -23,6 +23,7 @@ const SaveRouteOverlay = (props: SaveRouteOverlayProps) => {
           variant="standard"
           value={name}
           onChange={handleChange}
+          autoFocus
         />
         <button
           type="button"
