@@ -6,13 +6,12 @@ import { markers } from "./config/constants"
 import { applyCors } from "./config/cors"
 import path from "path"
 
-const isHeroku = process.env.NODE_ENV === "production"
-const port = isHeroku ? process.env.PORT : 3001
+const isProduction = process.env.NODE_ENV === "production"
+const port = isProduction ? process.env.PORT : 3001
 
 const app = express()
 
 app.get("/", function (req, res, next) {
-  //res.send("LANDING HERE")
   res.sendFile(path.resolve(__dirname + "/../reactApp/index.html"))
 })
 
@@ -43,11 +42,8 @@ process.on("SIGTERM", function () {
 
 process.on("SIGINT", function () {
   console.log("\nGracefully shutting down from SIGINT (Ctrl-C)")
-  // some other closing procedures go here
   process.exit(1)
 })
-
-//await server.start()
 
 app.use(express.json({ limit: "50mb" }))
 
@@ -58,13 +54,23 @@ app.use(express.static(path.resolve(__dirname + "/../reactApp")))
 app.use(express.static(path.resolve(__dirname + "/public")))
 app.use(express.static(path.resolve(__dirname + "/resources")))
 
+app.use(function (req, res, next) {
+  if (isProduction) {
+    if (req.secure || req.get("x-forwarded-proto") == "https") {
+      next()
+    } else {
+      res.redirect(`https://${req.hostname}${req.url}`)
+    }
+  } else {
+    next()
+  }
+})
+
 applyCors(app)
 
 //server.applyMiddleware({ app })
 
-console.log(`🚀 Server ready at http://localhost:${port}`)
-
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`🚀 Server ready at http://localhost:${port}`)
   //appStart()
 })

@@ -4,4 +4,73 @@
   overflow-x: hidden;
   overflow-y: auto;
   flex-direction: column;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.ActionContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+}
+
+.ActionButtonGreen {
+  width: 160px;
+  background-color: green;
+  color: white;
+  min-height: 40px;
+  font-size: 18px;
+}
+
+.ActionButtonRed {
+  width: 160px;
+  background-color: red;
+  color: white;
+  min-height: 40px;
+  font-size: 18px;
+}
+
+.FilterContainer {
+  padding-bottom: 40px;
+}
+
+.FilterSection {
+  margin-top: 20px;
+}
+
+.FilterCell {
+  display: flex;
+  flex-direction: row;
+}
+
+.FilterSectionTitle {
+  font-weight: bold;
+  text-align: start;
+  font-size: 18px;
+}
+
+.LowerButtonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.FooterContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.Footer {
+  font-size: 12px;
+  margin-bottom: 4px;
 }

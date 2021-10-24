@@ -190,14 +190,29 @@ const MapController = () => {
     setFilters(newFilters)
   }
 
+  const setNodesVisibility = (visibility: boolean) => {
+    let newFilters = filters.map((filter) => {
+      let newCells = filter.cells.map((cell) => {
+        return { ...cell, value: visibility }
+      })
+      return {
+        title: filter.title,
+        cells: newCells,
+      }
+    })
+    setFilters(newFilters)
+  }
+
   return (
     <div className={styles.MapController}>
-      <MapSideMenu filters={filters} onFilterChange={onFilterChange} />
+      <MapSideMenu
+        filters={filters}
+        onFilterChange={onFilterChange}
+        editingState={editingState}
+        setEditingState={setEditingState}
+        setNodesVisibility={setNodesVisibility}
+      />
       <div className={styles.MapContentArea}>
-        <MapActionBar
-          editingState={editingState}
-          setEditingState={setEditingState}
-        />
         <Map
           filters={filters}
           editingState={editingState}
