@@ -1,20 +1,36 @@
-import { useState } from "react"
-import { FilterSection } from "src/react/interfaces/types"
+import { useEffect, useState } from "react"
+import { FilterSection, Route } from "src/react/interfaces/types"
 import styles from "src/react/styles/MapController.module.css"
 import Map from "./Map"
 import MapSideMenu from "./MapSideMenu"
-import MapActionBar from "./MapActionBar"
+import Overlay from "src/react/components/core/Overlay"
+import SaveRouteOverlay from "../overlays/SaveRouteOverlay"
+import localforage from "localforage"
+import { toast } from "react-toastify"
+import LoadRouteOverlay from "../overlays/LoadRouteOverlay"
 
 export enum MapEditingState {
-  Blank = "BLANK",
-  Editing = "EDITING",
-  Complete = "COMPLETE",
+  Blank = "BLANK", // No polygon created or loaded
+  Editing = "EDITING", // Polygon being drawn
+  Complete = "COMPLETE", // Polygon drawn or loaded and is visible
+  Saving = "SAVING", // Saving a drawn polygon.  Overlay visible.
+  Loading = "LOADING", // Loading a saved polygon.  Overlay visible
 }
 
 const MapController = () => {
+  const [route, setRoute] = useState<any | null>(null)
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
   )
+  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (editingState === MapEditingState.Blank) {
+      setRoute(null)
+      setSelectedNodes(null)
+    }
+  }, [editingState])
+
   const [filters, setFilters] = useState<FilterSection[]>([
     {
       title: "Ores",
@@ -203,8 +219,47 @@ const MapController = () => {
     setFilters(newFilters)
   }
 
+  const saveRoute = async (name: string) => {
+    console.log("SAVE ROUTE TO STORAGE: ", name)
+
+    let newRoute: Route = {
+      name: name,
+      geojson: route,
+      selectedNodes: selectedNodes,
+    }
+
+    let routes: Route[] = (await localforage.getItem("routes")) ?? []
+    let index = routes.findIndex((route) => route.name === name)
+    if (index == -1) {
+      routes.push(newRoute)
+    } else {
+      routes[index] = newRoute
+    }
+
+    await localforage.setItem("routes", routes)
+    toast.success("Route saved successfully")
+    setEditingState(MapEditingState.Complete)
+  }
+
+  const loadRoute = async (name: string) => {
+    console.log("LOAD ROUTE FROM STORAGE: ", name)
+    let routes: Route[] = (await localforage.getItem("routes")) ?? []
+    let route = routes.find((route) => route.name == name)
+    if (route) {
+      setSelectedNodes(route.selectedNodes)
+      setRoute(route.geojson)
+      setEditingState(MapEditingState.Complete)
+    }
+  }
+
   return (
     <div className={styles.MapController}>
+      {editingState === MapEditingState.Saving && (
+        <SaveRouteOverlay saveRoute={saveRoute} />
+      )}
+      {editingState === MapEditingState.Loading && (
+        <LoadRouteOverlay loadRoute={loadRoute} />
+      )}
       <MapSideMenu
         filters={filters}
         onFilterChange={onFilterChange}
@@ -217,6 +272,10 @@ const MapController = () => {
           filters={filters}
           editingState={editingState}
           setEditingState={setEditingState}
+          setRoute={setRoute}
+          route={route}
+          selectedNodes={selectedNodes}
+          setSelectedNodes={setSelectedNodes}
         />
       </div>
     </div>

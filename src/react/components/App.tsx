@@ -1,6 +1,8 @@
 import React from "react"
 import styles from "../styles/App.module.css"
 import MapController from "./MapController"
+import "react-toastify/dist/ReactToastify.css"
+import { ToastContainer } from "react-toastify"
 
 const App = () => {
   return (
@@ -8,6 +10,7 @@ const App = () => {
       <div className={styles.MainContainer}>
         <MapController />
       </div>
+      <ToastContainer />
     </div>
   )
 }

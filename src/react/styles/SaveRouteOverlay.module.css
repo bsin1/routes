@@ -1,0 +1,8 @@
+.SaveRouteOverlay {
+  display: flex;
+  flex-direction: column;
+}
+
+.SaveButton {
+  margin-top: 16px;
+}

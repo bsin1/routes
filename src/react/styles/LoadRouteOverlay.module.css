@@ -1,0 +1,18 @@
+.LoadRouteOverlay {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 12px;
+}
+
+.LoadButton {
+  margin-top: 16px;
+}
+
+.OverlayTitle {
+  font-weight: bold;
+}
+
+.RoutesContainer {
+  margin-top: 8px;
+}

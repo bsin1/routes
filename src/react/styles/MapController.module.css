@@ -13,3 +13,12 @@
   height: 100vh;
   flex-grow: 1;
 }
+
+.OverlayContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.OverlayTitle {
+  text-align: center;
+}

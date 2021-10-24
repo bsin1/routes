@@ -36,18 +36,28 @@ const MapSideMenu = (props: MapSideMenuProps) => {
     })
   }
 
-  const renderActionContent = (): JSX.Element => {
+  const renderActionContent = (): JSX.Element | JSX.Element[] => {
     switch (props.editingState) {
       case MapEditingState.Blank:
-        return (
+      case MapEditingState.Loading:
+        return [
           <button
+            key={1}
             className={styles.ActionButtonGreen}
             type="button"
             onClick={() => props.setEditingState(MapEditingState.Editing)}
           >
             Create Area
-          </button>
-        )
+          </button>,
+          <button
+            key={2}
+            className={styles.ActionButtonBlue}
+            type="button"
+            onClick={() => props.setEditingState(MapEditingState.Loading)}
+          >
+            Load Route
+          </button>,
+        ]
       case MapEditingState.Editing:
         return (
           <div style={{ whiteSpace: "pre-wrap" }}>
@@ -55,17 +65,25 @@ const MapSideMenu = (props: MapSideMenuProps) => {
           </div>
         )
       case MapEditingState.Complete:
-        return (
-          <div className={styles.CompleteContainer}>
-            <button
-              className={styles.ActionButtonRed}
-              type="button"
-              onClick={() => props.setEditingState(MapEditingState.Blank)}
-            >
-              Clear Area
-            </button>
-          </div>
-        )
+      case MapEditingState.Saving:
+        return [
+          <button
+            key={1}
+            className={styles.ActionButtonRed}
+            type="button"
+            onClick={() => props.setEditingState(MapEditingState.Blank)}
+          >
+            Clear Area
+          </button>,
+          <button
+            key={2}
+            className={styles.ActionButtonBlue}
+            type="button"
+            onClick={() => props.setEditingState(MapEditingState.Saving)}
+          >
+            Save Route
+          </button>,
+        ]
     }
   }
 
@@ -97,7 +115,7 @@ const MapSideMenu = (props: MapSideMenuProps) => {
       {renderLowerContainer()}
       <div className={styles.FooterContainer}>
         <div className={styles.Footer}>
-          {"marker sprites created by     "}
+          {"marker sprites by     "}
           <a href="https://mapgenie.io/new-world/maps/aeternum">MapGenie</a>
         </div>
         {"\n"}

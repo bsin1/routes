@@ -16,6 +16,10 @@ interface MapProps {
   filters: FilterSection[]
   editingState: MapEditingState
   setEditingState: (editingState: MapEditingState) => void
+  setRoute: (route: any) => void
+  route: any | null
+  selectedNodes: string | null
+  setSelectedNodes: (selectedNodes: string) => void
 }
 
 let air = dataGeojson.essences.air_boid
@@ -78,14 +82,20 @@ let layers = [
   "strawberry_points",
 ]
 
-const Map = ({ filters, editingState, setEditingState }: MapProps) => {
+const Map = ({
+  filters,
+  editingState,
+  setEditingState,
+  route,
+  setRoute,
+  selectedNodes,
+  setSelectedNodes,
+}: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null)
   const draw = useRef<MapboxDraw | null>(null)
   const defaultLat = 0.04092881639623261
   const defaultLng = 0.08654556598968949
   const defaultZoom = 12.5
-
-  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
 
   useEffect(() => {
     loadMap()
@@ -99,6 +109,10 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
     updateEditingState()
   }, [editingState])
 
+  useEffect(() => {
+    renderRoute()
+  }, [route])
+
   const updateEditingState = () => {
     switch (editingState) {
       case MapEditingState.Editing: {
@@ -107,20 +121,12 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
       }
       case MapEditingState.Blank: {
         draw.current?.deleteAll()
-        if (map.current?.getLayer("route") !== undefined) {
-          map.current?.removeLayer("route")
-        }
-        if (map.current?.getSource("route") !== undefined) {
-          map.current?.removeSource("route")
-        }
-        setSelectedNodes(null)
         break
       }
     }
   }
 
   const clearLayers = () => {
-    console.log("MAP: ", map)
     layers.forEach((layer) => {
       if (map.current?.getLayer(layer) !== undefined) {
         map.current?.removeLayer(layer)
@@ -129,10 +135,7 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
   }
 
   const loadMap = () => {
-    console.log("LOAD MAP")
-
     let token = process.env.REACT_APP_MAPBOX_TOKEN ?? ""
-    console.log("GOT TOKEN: ", token)
     mapboxgl.accessToken = token
     let container = document.getElementById("main-map")!
 
@@ -173,8 +176,6 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
   }
 
   const updateArea = (event: any) => {
-    console.log("GOT DRAW EVENT: ", event)
-
     let polygon = event.features[0]
 
     //create bounding box from polygon
@@ -213,7 +214,6 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
       let coordinates = selectedFeatures.map(
         (item) => (item.geometry as any).coordinates
       )
-      console.log("INITIAL COORDINATES SIZE: ", coordinates.length)
 
       let orderedCords: any[] = []
 
@@ -224,12 +224,9 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
         let shortest = 9999999999
         let index = -1
 
-        console.log("NODE: ", node)
-
         coordinates.forEach((coordinate, i) => {
           let xdiff = Math.abs(node[0] - coordinate[0])
           let ydiff = Math.abs(node[1] - coordinate[1])
-          console.log("COORDINATE: ", coordinate)
           let weight = Math.sqrt(Math.pow(xdiff, 2) + Math.pow(ydiff, 2))
 
           if (weight < shortest) {
@@ -243,20 +240,6 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
           orderedCords.push(removed[0])
         }
       }
-
-      console.log("ORDERED CORDS: ", orderedCords)
-
-      let nodesByType = selectedFeatures.reduce((result, item) => {
-        let source = item.layer.source
-        console.log("SOURCE: ", source)
-        console.log("RESULT: ", result)
-        if (!(source in result)) {
-          result[source] = 1
-        } else {
-          result[source] += 1
-        }
-        return result
-      }, {})
 
       let geojson = {
         type: "geojson",
@@ -274,36 +257,28 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
         },
       }
 
-      map.current?.addSource("route", geojson as any)
-      map.current?.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#ff0000",
-          "line-width": 5,
-        },
-      })
+      let nodesByType = selectedFeatures.reduce((result, item) => {
+        let source = item.layer.source
+        if (!(source in result)) {
+          result[source] = 1
+        } else {
+          result[source] += 1
+        }
+        return result
+      }, {})
 
       let selectedNodesString = Object.entries(nodesByType)
         .map((item) => `${item[0]}: ${item[1]}`)
         .join("\n")
 
+      setRoute(geojson)
       setEditingState(MapEditingState.Complete)
       setSelectedNodes(`Selected Nodes\n${selectedNodesString}`)
-
-      console.log("SELECTED FEATURES: ", selectedFeatures)
     }
   }
 
   const loadSymbols = () => {
-    console.log("LOAD SYMBOLS")
     if (map.current?.isStyleLoaded() === false) {
-      console.log("STYLE NOT YET LOADED")
       setTimeout(() => {
         loadSymbols()
       }, 250)
@@ -468,6 +443,32 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
     })
   }
 
+  const renderRoute = () => {
+    if (route) {
+      map.current?.addSource("route", route as any)
+      map.current?.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "#ff0000",
+          "line-width": 5,
+        },
+      })
+    } else {
+      if (map.current?.getLayer("route") !== undefined) {
+        map.current?.removeLayer("route")
+      }
+      if (map.current?.getSource("route") !== undefined) {
+        map.current?.removeSource("route")
+      }
+    }
+  }
+
   const zoomToMapRegion = (
     latitude: number,
     longitude: number,
@@ -483,10 +484,7 @@ const Map = ({ filters, editingState, setEditingState }: MapProps) => {
     }, 5000)
   }
 
-  let data = `THIS IS THE DATA\nDATA 1\nDATA 2\nDATA 3`
-
   return (
-    // <div className={styles.MapContainer}>
     <div id="main-map" className={styles.Map}>
       {selectedNodes != null && (
         <div className={styles.SelectedNodes}>{selectedNodes}</div>

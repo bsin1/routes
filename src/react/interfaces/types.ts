@@ -8,3 +8,9 @@ export interface BooleanFilterCell {
   value: boolean
   key: string
 }
+
+export interface Route {
+  name: string
+  geojson: any
+  selectedNodes: string | null
+}
