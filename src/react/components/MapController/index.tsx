@@ -8,26 +8,32 @@ import SaveRouteOverlay from "../overlays/SaveRouteOverlay"
 import localforage from "localforage"
 import { toast } from "react-toastify"
 import LoadRouteOverlay from "../overlays/LoadRouteOverlay"
+import ExportRouteOverlay from "../overlays/ExportRouteOverlay"
+import ImportRouteOverlay from "../overlays/ImportRouteOverlay"
 
 export enum MapEditingState {
   Blank = "BLANK", // No polygon created or loaded
-  Editing = "EDITING", // Polygon being drawn
   Complete = "COMPLETE", // Polygon drawn or loaded and is visible
-  Saving = "SAVING", // Saving a drawn polygon.  Overlay visible.
+  Editing = "EDITING", // Polygon being drawn
+  Exporting = "EXPORTING", //Route being exported.
+  Importing = "IMPORTING", // Route being imported.
   Loading = "LOADING", // Loading a saved polygon.  Overlay visible
+  Saving = "SAVING", // Saving a drawn polygon.  Overlay visible.
 }
 
 const MapController = () => {
-  const [route, setRoute] = useState<any | null>(null)
+  const [route, setRoute] = useState<Route | null>(null)
+
+  //const [route, setRoute] = useState<any | null>(null)
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
   )
-  const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
+  //const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
 
   useEffect(() => {
     if (editingState === MapEditingState.Blank) {
       setRoute(null)
-      setSelectedNodes(null)
+      //setSelectedNodes(null)
     }
   }, [editingState])
 
@@ -221,21 +227,24 @@ const MapController = () => {
 
   const saveRoute = async (name: string) => {
     console.log("SAVE ROUTE TO STORAGE: ", name)
-
-    let newRoute: Route = {
-      name: name,
-      geojson: route,
-      selectedNodes: selectedNodes,
+    console.log("ATTEMPTING TO SAVE ROUTE: ", route)
+    if (!route) {
+      return
     }
+
+    // let newRoute: Route = {
+    //   name: name,
+    //   geojson: route,
+    //   selectedNodes: selectedNodes,
+    // }
 
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let index = routes.findIndex((route) => route.name === name)
     if (index == -1) {
-      routes.push(newRoute)
+      routes.push(route)
     } else {
-      routes[index] = newRoute
+      routes[index] = route
     }
-
     await localforage.setItem("routes", routes)
     toast.success("Route saved successfully")
     setEditingState(MapEditingState.Complete)
@@ -246,20 +255,39 @@ const MapController = () => {
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let route = routes.find((route) => route.name == name)
     if (route) {
-      setSelectedNodes(route.selectedNodes)
-      setRoute(route.geojson)
+      // setSelectedNodes(route.selectedNodes)
+      // setRoute(route.geojson)
+      setRoute(route)
       setEditingState(MapEditingState.Complete)
+    }
+  }
+
+  const importRoute = (route: Route) => {
+    console.log("IMPORT ROUTE: ", route)
+    if (route) {
+      // setSelectedNodes(route.selectedNodes)
+      // setRoute(route.geojson)
+      setRoute(route)
+      setEditingState(MapEditingState.Complete)
+    }
+  }
+
+  const renderOverlays = (): JSX.Element | undefined => {
+    switch (editingState) {
+      case MapEditingState.Exporting:
+        return <ExportRouteOverlay route={route} />
+      case MapEditingState.Importing:
+        return <ImportRouteOverlay importRoute={importRoute} />
+      case MapEditingState.Loading:
+        return <LoadRouteOverlay loadRoute={loadRoute} />
+      case MapEditingState.Saving:
+        return <SaveRouteOverlay saveRoute={saveRoute} />
     }
   }
 
   return (
     <div className={styles.MapController}>
-      {editingState === MapEditingState.Saving && (
-        <SaveRouteOverlay saveRoute={saveRoute} />
-      )}
-      {editingState === MapEditingState.Loading && (
-        <LoadRouteOverlay loadRoute={loadRoute} />
-      )}
+      {renderOverlays()}
       <MapSideMenu
         filters={filters}
         onFilterChange={onFilterChange}
@@ -274,8 +302,6 @@ const MapController = () => {
           setEditingState={setEditingState}
           setRoute={setRoute}
           route={route}
-          selectedNodes={selectedNodes}
-          setSelectedNodes={setSelectedNodes}
         />
       </div>
     </div>

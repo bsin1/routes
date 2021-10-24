@@ -40,6 +40,7 @@ const MapSideMenu = (props: MapSideMenuProps) => {
     switch (props.editingState) {
       case MapEditingState.Blank:
       case MapEditingState.Loading:
+      case MapEditingState.Importing:
         return [
           <button
             key={1}
@@ -47,7 +48,7 @@ const MapSideMenu = (props: MapSideMenuProps) => {
             type="button"
             onClick={() => props.setEditingState(MapEditingState.Editing)}
           >
-            Create Area
+            Create Route
           </button>,
           <button
             key={2}
@@ -56,6 +57,14 @@ const MapSideMenu = (props: MapSideMenuProps) => {
             onClick={() => props.setEditingState(MapEditingState.Loading)}
           >
             Load Route
+          </button>,
+          <button
+            key={3}
+            className={styles.ActionButtonYellow}
+            type="button"
+            onClick={() => props.setEditingState(MapEditingState.Importing)}
+          >
+            Import Route
           </button>,
         ]
       case MapEditingState.Editing:
@@ -66,6 +75,7 @@ const MapSideMenu = (props: MapSideMenuProps) => {
         )
       case MapEditingState.Complete:
       case MapEditingState.Saving:
+      case MapEditingState.Exporting:
         return [
           <button
             key={1}
@@ -73,7 +83,7 @@ const MapSideMenu = (props: MapSideMenuProps) => {
             type="button"
             onClick={() => props.setEditingState(MapEditingState.Blank)}
           >
-            Clear Area
+            Clear Route
           </button>,
           <button
             key={2}
@@ -82,6 +92,14 @@ const MapSideMenu = (props: MapSideMenuProps) => {
             onClick={() => props.setEditingState(MapEditingState.Saving)}
           >
             Save Route
+          </button>,
+          <button
+            key={3}
+            className={styles.ActionButtonYellow}
+            type="button"
+            onClick={() => props.setEditingState(MapEditingState.Exporting)}
+          >
+            Export Route
           </button>,
         ]
     }

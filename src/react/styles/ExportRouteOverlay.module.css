@@ -1,0 +1,19 @@
+.ExportRouteOverlay {
+  display: flex;
+  flex-direction: column;
+}
+
+.OverlayTitle {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.CodeContainer {
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-top: 8px;
+  word-break: break-all;
+  padding: 12px;
+  font-size: 12px;
+  background-color: rgb(221, 220, 220);
+}

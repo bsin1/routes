@@ -4,9 +4,9 @@ import styles from "src/react/styles/Map.module.css"
 import mapboxgl from "mapbox-gl"
 import MapboxDraw from "@mapbox/mapbox-gl-draw"
 import * as turf from "@turf/turf"
-import { BACKEND_ROOT, mapStyle } from "src/react/config/constants"
+import { mapStyle } from "src/react/config/constants"
 import { dataGeojson } from "src/react/config/seed"
-import { BooleanFilterCell, FilterSection } from "src/react/interfaces/types"
+import { FilterSection, Route } from "src/react/interfaces/types"
 import { MapEditingState } from ".."
 import _ from "lodash"
 ;(mapboxgl as any).workerClass =
@@ -17,9 +17,9 @@ interface MapProps {
   editingState: MapEditingState
   setEditingState: (editingState: MapEditingState) => void
   setRoute: (route: any) => void
-  route: any | null
-  selectedNodes: string | null
-  setSelectedNodes: (selectedNodes: string) => void
+  route: Route | null
+  // selectedNodes: string | null
+  // setSelectedNodes: (selectedNodes: string) => void
 }
 
 let air = dataGeojson.essences.air_boid
@@ -88,8 +88,6 @@ const Map = ({
   setEditingState,
   route,
   setRoute,
-  selectedNodes,
-  setSelectedNodes,
 }: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null)
   const draw = useRef<MapboxDraw | null>(null)
@@ -241,6 +239,20 @@ const Map = ({
         }
       }
 
+      let nodesByType = selectedFeatures.reduce((result, item) => {
+        let source = item.layer.source
+        if (!(source in result)) {
+          result[source] = 1
+        } else {
+          result[source] += 1
+        }
+        return result
+      }, {})
+
+      let selectedNodesString = Object.entries(nodesByType)
+        .map((item) => `${item[0]}: ${item[1]}`)
+        .join("\n")
+
       let geojson = {
         type: "geojson",
         data: {
@@ -257,23 +269,15 @@ const Map = ({
         },
       }
 
-      let nodesByType = selectedFeatures.reduce((result, item) => {
-        let source = item.layer.source
-        if (!(source in result)) {
-          result[source] = 1
-        } else {
-          result[source] += 1
-        }
-        return result
-      }, {})
+      let newRoute: Route = {
+        name: "New Route",
+        selectedNodes: `Selected Nodes\n${selectedNodesString}`,
+        geojson: geojson,
+      }
 
-      let selectedNodesString = Object.entries(nodesByType)
-        .map((item) => `${item[0]}: ${item[1]}`)
-        .join("\n")
-
-      setRoute(geojson)
+      setRoute(newRoute)
       setEditingState(MapEditingState.Complete)
-      setSelectedNodes(`Selected Nodes\n${selectedNodesString}`)
+      //setSelectedNodes(`Selected Nodes\n${selectedNodesString}`)
     }
   }
 
@@ -445,7 +449,7 @@ const Map = ({
 
   const renderRoute = () => {
     if (route) {
-      map.current?.addSource("route", route as any)
+      map.current?.addSource("route", route.geojson as any)
       map.current?.addLayer({
         id: "route",
         type: "line",
@@ -486,8 +490,8 @@ const Map = ({
 
   return (
     <div id="main-map" className={styles.Map}>
-      {selectedNodes != null && (
-        <div className={styles.SelectedNodes}>{selectedNodes}</div>
+      {route?.selectedNodes != null && (
+        <div className={styles.SelectedNodes}>{route.selectedNodes}</div>
       )}
     </div>
   )

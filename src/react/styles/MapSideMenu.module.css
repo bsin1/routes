@@ -16,9 +16,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* height: 80px;
-  min-height: 80px;
-  max-height: 80px; */
 }
 
 .ActionButtonGreen {
@@ -40,6 +37,14 @@
 .ActionButtonBlue {
   width: 160px;
   background-color: blue;
+  color: white;
+  min-height: 40px;
+  font-size: 18px;
+}
+
+.ActionButtonYellow {
+  width: 160px;
+  background-color: rgb(219, 140, 22);
   color: white;
   min-height: 40px;
   font-size: 18px;

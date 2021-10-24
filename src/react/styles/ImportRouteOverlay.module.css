@@ -1,0 +1,13 @@
+.ImportRouteOverlay {
+  display: flex;
+  flex-direction: column;
+}
+
+.OverlayTitle {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.ImportButton {
+  margin-top: 16px;
+}
