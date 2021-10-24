@@ -5,12 +5,19 @@ import Overlay from "../../core/Overlay"
 import localforage from "localforage"
 import { Route } from "src/react/interfaces/types"
 import RouteCell from "./RouteCell"
+import { MapEditingState } from "../../MapController"
 
 interface LoadRouteOverlayProps {
   loadRoute: (name: string) => void
+  editingState: MapEditingState
+  setEditingState: (state: MapEditingState) => void
 }
 
-const LoadRouteOverlay = ({ loadRoute }: LoadRouteOverlayProps) => {
+const LoadRouteOverlay = ({
+  loadRoute,
+  editingState,
+  setEditingState,
+}: LoadRouteOverlayProps) => {
   const [routes, setRoutes] = useState<Route[]>([])
 
   useEffect(() => {
@@ -30,7 +37,7 @@ const LoadRouteOverlay = ({ loadRoute }: LoadRouteOverlayProps) => {
   }
 
   return (
-    <Overlay>
+    <Overlay editingState={editingState} setEditingState={setEditingState}>
       <div className={styles.LoadRouteOverlay}>
         <div className={styles.OverlayTitle}>Load Route</div>
         <div className={styles.RoutesContainer}>{renderRoutes()}</div>

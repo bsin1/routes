@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   min-width: 200px;
-  padding: 12px;
 }
 
 .LoadButton {
@@ -10,7 +9,6 @@
 }
 
 .OverlayTitle {
-  font-weight: bold;
 }
 
 .RoutesContainer {

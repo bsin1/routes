@@ -13,6 +13,18 @@
   max-width: 400px;
 }
 
+.CloseContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.CloseIcon {
+  max-width: 25px;
+  max-height: 25px;
+  cursor: pointer;
+}
+
 .OverlayContent {
   margin-top: 16px;
   flex-grow: 1;

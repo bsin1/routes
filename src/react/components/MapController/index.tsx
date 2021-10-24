@@ -275,13 +275,37 @@ const MapController = () => {
   const renderOverlays = (): JSX.Element | undefined => {
     switch (editingState) {
       case MapEditingState.Exporting:
-        return <ExportRouteOverlay route={route} />
+        return (
+          <ExportRouteOverlay
+            route={route}
+            editingState={editingState}
+            setEditingState={setEditingState}
+          />
+        )
       case MapEditingState.Importing:
-        return <ImportRouteOverlay importRoute={importRoute} />
+        return (
+          <ImportRouteOverlay
+            importRoute={importRoute}
+            editingState={editingState}
+            setEditingState={setEditingState}
+          />
+        )
       case MapEditingState.Loading:
-        return <LoadRouteOverlay loadRoute={loadRoute} />
+        return (
+          <LoadRouteOverlay
+            loadRoute={loadRoute}
+            editingState={editingState}
+            setEditingState={setEditingState}
+          />
+        )
       case MapEditingState.Saving:
-        return <SaveRouteOverlay saveRoute={saveRoute} />
+        return (
+          <SaveRouteOverlay
+            saveRoute={saveRoute}
+            editingState={editingState}
+            setEditingState={setEditingState}
+          />
+        )
     }
   }
 

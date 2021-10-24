@@ -3,19 +3,26 @@ import TextField from "@mui/material/TextField"
 import { useState } from "react"
 import Overlay from "../core/Overlay"
 import { Route } from "src/react/interfaces/types"
+import { MapEditingState } from "../MapController"
 
 interface ImportRouteOverlayProps {
   importRoute: (route: Route) => void
+  editingState: MapEditingState
+  setEditingState: (state: MapEditingState) => void
 }
 
-const ImportRouteOverlay = ({ importRoute }: ImportRouteOverlayProps) => {
+const ImportRouteOverlay = ({
+  importRoute,
+  editingState,
+  setEditingState,
+}: ImportRouteOverlayProps) => {
   const [code, setCode] = useState<string>("")
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCode(event.target.value)
   }
 
   return (
-    <Overlay>
+    <Overlay editingState={editingState} setEditingState={setEditingState}>
       <div className={styles.ImportRouteOverlay}>
         <div className={styles.OverlayTitle}>Import Route</div>
         <TextField
