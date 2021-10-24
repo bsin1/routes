@@ -10,6 +10,7 @@ import { toast } from "react-toastify"
 import LoadRouteOverlay from "../overlays/LoadRouteOverlay"
 import ExportRouteOverlay from "../overlays/ExportRouteOverlay"
 import ImportRouteOverlay from "../overlays/ImportRouteOverlay"
+import e from "cors"
 
 export enum MapEditingState {
   Blank = "BLANK", // No polygon created or loaded
@@ -24,16 +25,13 @@ export enum MapEditingState {
 const MapController = () => {
   const [route, setRoute] = useState<Route | null>(null)
 
-  //const [route, setRoute] = useState<any | null>(null)
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
   )
-  //const [selectedNodes, setSelectedNodes] = useState<string | null>(null)
 
   useEffect(() => {
     if (editingState === MapEditingState.Blank) {
       setRoute(null)
-      //setSelectedNodes(null)
     }
   }, [editingState])
 
@@ -232,12 +230,6 @@ const MapController = () => {
       return
     }
 
-    // let newRoute: Route = {
-    //   name: name,
-    //   geojson: route,
-    //   selectedNodes: selectedNodes,
-    // }
-
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let index = routes.findIndex((route) => route.name === name)
     if (index == -1) {
@@ -255,18 +247,6 @@ const MapController = () => {
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let route = routes.find((route) => route.name == name)
     if (route) {
-      // setSelectedNodes(route.selectedNodes)
-      // setRoute(route.geojson)
-      setRoute(route)
-      setEditingState(MapEditingState.Complete)
-    }
-  }
-
-  const importRoute = (route: Route) => {
-    console.log("IMPORT ROUTE: ", route)
-    if (route) {
-      // setSelectedNodes(route.selectedNodes)
-      // setRoute(route.geojson)
       setRoute(route)
       setEditingState(MapEditingState.Complete)
     }
@@ -285,7 +265,7 @@ const MapController = () => {
       case MapEditingState.Importing:
         return (
           <ImportRouteOverlay
-            importRoute={importRoute}
+            setRoute={setRoute}
             editingState={editingState}
             setEditingState={setEditingState}
           />

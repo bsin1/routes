@@ -4,21 +4,36 @@ import { useState } from "react"
 import Overlay from "../core/Overlay"
 import { Route } from "src/react/interfaces/types"
 import { MapEditingState } from "../MapController"
+import { toast } from "react-toastify"
 
 interface ImportRouteOverlayProps {
-  importRoute: (route: Route) => void
+  setRoute: (route: Route) => void
   editingState: MapEditingState
   setEditingState: (state: MapEditingState) => void
 }
 
 const ImportRouteOverlay = ({
-  importRoute,
+  setRoute,
   editingState,
   setEditingState,
 }: ImportRouteOverlayProps) => {
   const [code, setCode] = useState<string>("")
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCode(event.target.value)
+  }
+
+  const parseRoute = () => {
+    try {
+      let data = JSON.parse(Buffer.from(code, "base64").toString())
+      if (data && data.geojson && data.selectedNodes) {
+        setRoute(data)
+        setEditingState(MapEditingState.Complete)
+      } else {
+        toast.error("Route Import Failed")
+      }
+    } catch (e) {
+      toast.error("Route Import Failed")
+    }
   }
 
   return (
@@ -37,9 +52,7 @@ const ImportRouteOverlay = ({
         />
         <button
           type="button"
-          onClick={() =>
-            importRoute(JSON.parse(Buffer.from(code, "base64").toString()))
-          }
+          onClick={parseRoute}
           disabled={code == ""}
           className={styles.ImportButton}
         >
