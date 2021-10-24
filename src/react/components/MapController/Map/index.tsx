@@ -190,19 +190,15 @@ const Map = ({
         polygonBoundingBox[3],
       ])
 
-      let activeFilters = [
-        ...filters[0].cells,
-        ...filters[1].cells,
-        ...filters[2].cells,
-      ]
-        .filter((cell) => cell.value == true)
-        .map((cell) => `${cell.key}_points`)
+      let activeLayers = layers.filter(
+        (layer) => map.current?.getLayer(layer) !== undefined
+      )
 
-      activeFilters = [...activeFilters, "outpost_points"]
+      activeLayers = [...activeLayers, "outpost_points"]
 
       let selectedFeatures: any[] = map.current
         .queryRenderedFeatures([southWest, northEast], {
-          layers: activeFilters, //Update to use layers in user's map, tested with circle and choropleth
+          layers: activeLayers,
         })
         .filter((item) => {
           let coordinates = (item.geometry as any).coordinates
