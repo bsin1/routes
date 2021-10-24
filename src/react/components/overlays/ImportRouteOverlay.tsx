@@ -33,7 +33,7 @@ const ImportRouteOverlay = ({
           value={code}
           onChange={handleChange}
           autoFocus
-          style={{ width: 400 }}
+          style={{ width: 400, maxHeight: 400, overflowY: "auto" }}
         />
         <button
           type="button"

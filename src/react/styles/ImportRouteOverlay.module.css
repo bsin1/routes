@@ -1,6 +1,7 @@
 .ImportRouteOverlay {
   display: flex;
   flex-direction: column;
+  max-height: 500px;
 }
 
 .OverlayTitle {
