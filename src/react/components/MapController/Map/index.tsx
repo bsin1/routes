@@ -406,16 +406,19 @@ const Map = ({
         map.current?.addSource(item.imageId, item.data as any)
       })
 
-      map.current?.addLayer({
-        id: `outpost_points`,
-        type: "symbol",
-        source: "outpost", // reference the data source
-        layout: {
-          "icon-allow-overlap": true,
-          "icon-image": "outpost", // reference the image
-          "icon-size": 1,
+      map.current?.addLayer(
+        {
+          id: `outpost_points`,
+          type: "symbol",
+          source: "outpost", // reference the data source
+          layout: {
+            "icon-allow-overlap": true,
+            "icon-image": "outpost", // reference the image
+            "icon-size": 1,
+          },
         },
-      })
+        "gl-draw-polygon-fill-inactive.cold"
+      )
 
       updateLayers()
       zoomToMapRegion(defaultLat, defaultLng, defaultZoom)
@@ -428,16 +431,19 @@ const Map = ({
     filters.forEach((filter) => {
       filter.cells.forEach((cell) => {
         if (cell.value) {
-          map.current?.addLayer({
-            id: `${cell.key}_points`,
-            type: "symbol",
-            source: cell.key, // reference the data source
-            layout: {
-              "icon-allow-overlap": true,
-              "icon-image": cell.key, // reference the image
-              "icon-size": 1,
+          map.current?.addLayer(
+            {
+              id: `${cell.key}_points`,
+              type: "symbol",
+              source: cell.key, // reference the data source
+              layout: {
+                "icon-allow-overlap": true,
+                "icon-image": cell.key, // reference the image
+                "icon-size": 1,
+              },
             },
-          })
+            "gl-draw-polygon-fill-inactive.cold"
+          )
         }
       })
     })
@@ -459,6 +465,13 @@ const Map = ({
           "line-width": 5,
         },
       })
+      // let activeLayers = layers.filter(
+      //   (layer) => map.current?.getLayer(layer) !== undefined
+      // )
+      // activeLayers = [...activeLayers, "outpost_points"]
+      // activeLayers.forEach((layer) => {
+      //   map.current?.moveLayer("route", layer)
+      // })
     } else {
       if (map.current?.getLayer("route") !== undefined) {
         map.current?.removeLayer("route")
