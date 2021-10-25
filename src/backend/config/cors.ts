@@ -12,7 +12,6 @@ export function applyCors(app: any) {
   var corsOptions = {
     origin: function (origin: any, callback: any) {
       var originIsWhitelisted = whitelist.indexOf(origin) !== -1
-      console.log("ORIGIN TEST: ", originIsWhitelisted)
       callback(null, originIsWhitelisted)
     },
     credentials: true,

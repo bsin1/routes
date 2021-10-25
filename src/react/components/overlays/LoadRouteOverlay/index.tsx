@@ -30,7 +30,6 @@ const LoadRouteOverlay = ({
   }
 
   const renderRoutes = (): JSX.Element | JSX.Element[] => {
-    console.log("RENDER ROUTES: ", routes.length)
     if (routes.length == 0) {
       return <div>You have no saved routes.</div>
     }

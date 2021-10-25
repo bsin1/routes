@@ -103,7 +103,6 @@ const Map = ({
 
   useEffect(() => {
     updateLayers(true)
-    console.log("NEW FILTERS IN MAP: ", filters)
   }, [filters])
 
   useEffect(() => {
@@ -433,7 +432,6 @@ const Map = ({
   }
 
   const updateLayers = (clear: boolean) => {
-    console.log("updateLayers")
     if (clear) {
       clearLayers()
     }

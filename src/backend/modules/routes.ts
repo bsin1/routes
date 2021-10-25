@@ -11,20 +11,8 @@ export const appStart = async () => {
   let data = fs.readFileSync("seed/data.json")
   let json = JSON.parse(data.toString())
   let city = json.pois.cutlass_keys.d1r
-  let cityCord: Coordinate = { x: city.x, y: city.y }
 
   let keys = ["chests", "essences", "ores", "plants", "woods", "pois"]
-
-  let ores: Coordinate[] = Object.values(json.ores.iron)
-
-  /* ORDER ORES USING SHORTEST PATH */
-  let orderedOres: Coordinate[] = []
-
-  // orderedOres.push(cityCord)
-
-  // console.log("ORES LENGTH: ", ores.length)
-
-  // orderedOres.push(cityCord)
 
   /***  CONVERT DATA TO WGS84 COORDINATE SYSTEM  ***/
   let wgsData: any = keys.reduce((result, key) => {

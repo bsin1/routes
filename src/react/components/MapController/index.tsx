@@ -24,10 +24,6 @@ export enum MapEditingState {
 const MapController = () => {
   const [route, setRoute] = useState<Route | null>(null)
 
-  useEffect(() => {
-    console.log("NEW ROUTE SET: ", route)
-  }, [route])
-
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
   )
@@ -214,7 +210,6 @@ const MapController = () => {
   }
 
   const setNodesVisibility = (visibility: boolean, nodes?: string[]) => {
-    console.log("SET NODES VISIBILITY: ", nodes)
     let newFilters = [...filters]
 
     filters.forEach((filter, sectionIndex) => {
@@ -232,13 +227,10 @@ const MapController = () => {
       newFilters[sectionIndex].cells = newCells
     })
 
-    console.log("NEW FILTERS: ", newFilters)
-
     setFilters(newFilters)
   }
 
   const saveRoute = async (name: string) => {
-    console.log("SAVE ROUTE TO STORAGE: ", name)
     if (!route) {
       return
     }
@@ -247,8 +239,6 @@ const MapController = () => {
       ...route,
       name: name,
     }
-
-    console.log("ATTEMPTING TO SAVE ROUTE: ", renamedRoute)
 
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let index = routes.findIndex((route) => route.name === name)
@@ -259,15 +249,14 @@ const MapController = () => {
     }
     await localforage.setItem("routes", routes)
     toast.success("Route saved successfully")
+    setRoute(renamedRoute)
     setEditingState(MapEditingState.Complete)
   }
 
   const loadRoute = async (name: string) => {
-    console.log("LOAD ROUTE FROM STORAGE: ", name)
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let route = routes.find((route) => route.name == name)
     if (route) {
-      console.log("LOADED ROUTE: ", route)
       setRoute(route)
       setNodesVisibility(true, route.filters)
       setEditingState(MapEditingState.Complete)
@@ -275,7 +264,6 @@ const MapController = () => {
   }
 
   const createRoute = (geojson: any, selectedNodes: string) => {
-    console.log("CREATE ROUTE FILTERS: ", filters)
     let newRoute: Route = {
       name: "New Route",
       selectedNodes: selectedNodes,
@@ -288,8 +276,6 @@ const MapController = () => {
   }
 
   const extractFilters = (): string[] => {
-    console.log("EXTRACT FILTERS: ", filters)
-
     let activeFilters: string[] = []
     filters.forEach((filter) => {
       filter.cells.forEach((cell) => {
@@ -298,8 +284,6 @@ const MapController = () => {
         }
       })
     })
-
-    console.log("EXTRACTED FILTERS: ", activeFilters)
 
     return activeFilters
   }
