@@ -7,12 +7,14 @@ import { MapEditingState } from "../MapController"
 import { toast } from "react-toastify"
 
 interface ImportRouteOverlayProps {
+  setNodesVisibility: (visibility: boolean, nodes?: string[]) => void
   setRoute: (route: Route) => void
   editingState: MapEditingState
   setEditingState: (state: MapEditingState) => void
 }
 
 const ImportRouteOverlay = ({
+  setNodesVisibility,
   setRoute,
   editingState,
   setEditingState,
@@ -25,7 +27,8 @@ const ImportRouteOverlay = ({
   const parseRoute = () => {
     try {
       let data = JSON.parse(Buffer.from(code, "base64").toString())
-      if (data && data.geojson && data.selectedNodes) {
+      if (data && data.geojson && data.selectedNodes && data.filters) {
+        setNodesVisibility(true, data.filters)
         setRoute(data)
         setEditingState(MapEditingState.Complete)
       } else {

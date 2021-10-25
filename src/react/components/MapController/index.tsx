@@ -10,7 +10,6 @@ import { toast } from "react-toastify"
 import LoadRouteOverlay from "../overlays/LoadRouteOverlay"
 import ExportRouteOverlay from "../overlays/ExportRouteOverlay"
 import ImportRouteOverlay from "../overlays/ImportRouteOverlay"
-import e from "cors"
 
 export enum MapEditingState {
   Blank = "BLANK", // No polygon created or loaded
@@ -24,6 +23,10 @@ export enum MapEditingState {
 
 const MapController = () => {
   const [route, setRoute] = useState<Route | null>(null)
+
+  useEffect(() => {
+    console.log("NEW ROUTE SET: ", route)
+  }, [route])
 
   const [editingState, setEditingState] = useState<MapEditingState>(
     MapEditingState.Blank
@@ -210,32 +213,49 @@ const MapController = () => {
     setFilters(newFilters)
   }
 
-  const setNodesVisibility = (visibility: boolean) => {
-    let newFilters = filters.map((filter) => {
-      let newCells = filter.cells.map((cell) => {
-        return { ...cell, value: visibility }
+  const setNodesVisibility = (visibility: boolean, nodes?: string[]) => {
+    console.log("SET NODES VISIBILITY: ", nodes)
+    let newFilters = [...filters]
+
+    filters.forEach((filter, sectionIndex) => {
+      let newCells = [...filters[sectionIndex].cells]
+
+      filter.cells.forEach((cell, cellIndex) => {
+        let value = visibility
+        if (nodes) {
+          if (nodes.includes(cell.key) == false) {
+            value = false
+          }
+        }
+        newCells[cellIndex].value = value
       })
-      return {
-        title: filter.title,
-        cells: newCells,
-      }
+      newFilters[sectionIndex].cells = newCells
     })
+
+    console.log("NEW FILTERS: ", newFilters)
+
     setFilters(newFilters)
   }
 
   const saveRoute = async (name: string) => {
     console.log("SAVE ROUTE TO STORAGE: ", name)
-    console.log("ATTEMPTING TO SAVE ROUTE: ", route)
     if (!route) {
       return
     }
 
+    let renamedRoute = {
+      ...route,
+      name: name,
+    }
+
+    console.log("ATTEMPTING TO SAVE ROUTE: ", renamedRoute)
+
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let index = routes.findIndex((route) => route.name === name)
     if (index == -1) {
-      routes.push(route)
+      routes.push(renamedRoute)
     } else {
-      routes[index] = route
+      routes[index] = renamedRoute
     }
     await localforage.setItem("routes", routes)
     toast.success("Route saved successfully")
@@ -247,9 +267,41 @@ const MapController = () => {
     let routes: Route[] = (await localforage.getItem("routes")) ?? []
     let route = routes.find((route) => route.name == name)
     if (route) {
+      console.log("LOADED ROUTE: ", route)
       setRoute(route)
+      setNodesVisibility(true, route.filters)
       setEditingState(MapEditingState.Complete)
     }
+  }
+
+  const createRoute = (geojson: any, selectedNodes: string) => {
+    console.log("CREATE ROUTE FILTERS: ", filters)
+    let newRoute: Route = {
+      name: "New Route",
+      selectedNodes: selectedNodes,
+      geojson: geojson,
+      filters: extractFilters(),
+    }
+
+    setRoute(newRoute)
+    setEditingState(MapEditingState.Complete)
+  }
+
+  const extractFilters = (): string[] => {
+    console.log("EXTRACT FILTERS: ", filters)
+
+    let activeFilters: string[] = []
+    filters.forEach((filter) => {
+      filter.cells.forEach((cell) => {
+        if (cell.value == true) {
+          activeFilters.push(cell.key)
+        }
+      })
+    })
+
+    console.log("EXTRACTED FILTERS: ", activeFilters)
+
+    return activeFilters
   }
 
   const renderOverlays = (): JSX.Element | undefined => {
@@ -265,6 +317,7 @@ const MapController = () => {
       case MapEditingState.Importing:
         return (
           <ImportRouteOverlay
+            setNodesVisibility={setNodesVisibility}
             setRoute={setRoute}
             editingState={editingState}
             setEditingState={setEditingState}
@@ -306,6 +359,7 @@ const MapController = () => {
           setEditingState={setEditingState}
           setRoute={setRoute}
           route={route}
+          createRoute={createRoute}
         />
       </div>
     </div>

@@ -18,6 +18,7 @@ interface MapProps {
   setEditingState: (editingState: MapEditingState) => void
   setRoute: (route: any) => void
   route: Route | null
+  createRoute: (geojson: any, selectedNodes: string) => void
   // selectedNodes: string | null
   // setSelectedNodes: (selectedNodes: string) => void
 }
@@ -88,6 +89,7 @@ const Map = ({
   setEditingState,
   route,
   setRoute,
+  createRoute,
 }: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null)
   const draw = useRef<MapboxDraw | null>(null)
@@ -100,7 +102,8 @@ const Map = ({
   }, [])
 
   useEffect(() => {
-    updateLayers()
+    updateLayers(true)
+    console.log("NEW FILTERS IN MAP: ", filters)
   }, [filters])
 
   useEffect(() => {
@@ -265,15 +268,17 @@ const Map = ({
         },
       }
 
-      let newRoute: Route = {
-        name: "New Route",
-        selectedNodes: `Selected Nodes\n${selectedNodesString}`,
-        geojson: geojson,
-      }
+      createRoute(geojson, `Selected Nodes\n${selectedNodesString}`)
 
-      setRoute(newRoute)
-      setEditingState(MapEditingState.Complete)
-      //setSelectedNodes(`Selected Nodes\n${selectedNodesString}`)
+      // let newRoute: Route = {
+      //   name: "New Route",
+      //   selectedNodes: `Selected Nodes\n${selectedNodesString}`,
+      //   geojson: geojson,
+      //   filters: extractFilters(),
+      // }
+
+      // setRoute(newRoute)
+      // setEditingState(MapEditingState.Complete)
     }
   }
 
@@ -286,8 +291,6 @@ const Map = ({
       if (!map) {
         return
       }
-
-      //draw.current?.changeMode("static")
 
       let mapData = [
         { imageId: "outpost", data: dataGeojson.towns },
@@ -403,50 +406,63 @@ const Map = ({
       ]
 
       mapData.forEach((item) => {
-        map.current?.addSource(item.imageId, item.data as any)
+        if (map.current?.getSource(item.imageId) == undefined) {
+          map.current?.addSource(item.imageId, item.data as any)
+        }
       })
 
-      map.current?.addLayer(
-        {
-          id: `outpost_points`,
-          type: "symbol",
-          source: "outpost", // reference the data source
-          layout: {
-            "icon-allow-overlap": true,
-            "icon-image": "outpost", // reference the image
-            "icon-size": 1,
+      if (map.current?.getLayer("outpost_points") == undefined) {
+        map.current?.addLayer(
+          {
+            id: `outpost_points`,
+            type: "symbol",
+            source: "outpost", // reference the data source
+            layout: {
+              "icon-allow-overlap": true,
+              "icon-image": "outpost", // reference the image
+              "icon-size": 1,
+            },
           },
-        },
-        "gl-draw-polygon-fill-inactive.cold"
-      )
+          "gl-draw-polygon-fill-inactive.cold"
+        )
+      }
 
-      updateLayers()
+      updateLayers(true)
       zoomToMapRegion(defaultLat, defaultLng, defaultZoom)
     }
   }
 
-  const updateLayers = () => {
-    clearLayers()
+  const updateLayers = (clear: boolean) => {
+    console.log("updateLayers")
+    if (clear) {
+      clearLayers()
+    }
 
-    filters.forEach((filter) => {
-      filter.cells.forEach((cell) => {
-        if (cell.value) {
-          map.current?.addLayer(
-            {
-              id: `${cell.key}_points`,
-              type: "symbol",
-              source: cell.key, // reference the data source
-              layout: {
-                "icon-allow-overlap": true,
-                "icon-image": cell.key, // reference the image
-                "icon-size": 1,
+    if (map.current?.isStyleLoaded() === false) {
+      setTimeout(() => {
+        updateLayers(false)
+      }, 250)
+    } else {
+      filters.forEach((filter) => {
+        filter.cells.forEach((cell) => {
+          if (cell.value) {
+            map.current?.addLayer(
+              {
+                id: `${cell.key}_points`,
+                type: "symbol",
+                source: cell.key, // reference the data source
+                layout: {
+                  "icon-allow-overlap": true,
+                  "icon-image": cell.key, // reference the image
+                  "icon-size": 1,
+                },
               },
-            },
-            "gl-draw-polygon-fill-inactive.cold"
-          )
-        }
+              "gl-draw-polygon-fill-inactive.cold"
+            )
+          }
+        })
       })
-    })
+    }
   }
 
   const renderRoute = () => {
@@ -465,13 +481,6 @@ const Map = ({
           "line-width": 5,
         },
       })
-      // let activeLayers = layers.filter(
-      //   (layer) => map.current?.getLayer(layer) !== undefined
-      // )
-      // activeLayers = [...activeLayers, "outpost_points"]
-      // activeLayers.forEach((layer) => {
-      //   map.current?.moveLayer("route", layer)
-      // })
     } else {
       if (map.current?.getLayer("route") !== undefined) {
         map.current?.removeLayer("route")
@@ -491,10 +500,6 @@ const Map = ({
       center: new mapboxgl.LngLat(longitude, latitude),
       zoom: zoom,
     })
-
-    setTimeout(() => {
-      console.log("CURRENT ZOOM: ", map.current?.getZoom())
-    }, 5000)
   }
 
   return (

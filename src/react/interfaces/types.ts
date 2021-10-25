@@ -13,4 +13,5 @@ export interface Route {
   name: string
   geojson: any
   selectedNodes: string | null
+  filters: string[]
 }
