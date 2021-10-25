@@ -18,3 +18,7 @@
   overflow-y: auto;
   max-height: 400px;
 }
+
+.CopyButton {
+  margin-top: 16px;
+}
