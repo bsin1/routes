@@ -15,6 +15,9 @@ node data from [New World Maps](https://www.newworld-map.com)
 # Commands
 
 `npm run server` - Start the backend server in dev mode.  Used to generate node geojson and modify any backing node data.
+
 `npm run client` - Start the react client in dev mode.
+
 `npm run build` - Generate production builds for client and backend.
+
 `npm run start` - Start the production backend server.  This should only be used in production.
