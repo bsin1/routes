@@ -465,20 +465,22 @@ const Map = ({
 
   const renderRoute = () => {
     if (route) {
-      map.current?.addSource("route", route.geojson as any)
-      map.current?.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#ff0000",
-          "line-width": 5,
-        },
-      })
+      if (map.current?.getSource("route") == undefined) {
+        map.current?.addSource("route", route.geojson as any)
+        map.current?.addLayer({
+          id: "route",
+          type: "line",
+          source: "route",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#ff0000",
+            "line-width": 5,
+          },
+        })
+      }
     } else {
       if (map.current?.getLayer("route") !== undefined) {
         map.current?.removeLayer("route")
